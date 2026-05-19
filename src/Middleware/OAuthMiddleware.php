@@ -42,8 +42,8 @@ class OAuthMiddleware
      */
     public function __construct(
         ClientInterface $client,
-        GrantTypeInterface $grantType = null,
-        RefreshTokenGrantTypeInterface $refreshTokenGrantType = null
+        ?GrantTypeInterface $grantType = null,
+        ?RefreshTokenGrantTypeInterface $refreshTokenGrantType = null
     ) {
         $this->client = $client;
         $this->grantType = $grantType;

@@ -36,8 +36,8 @@ class MockOAuthMiddleware extends OAuthMiddleware
      */
     public function __construct(
         ClientInterface $client,
-        GrantTypeInterface $grantType = null,
-        RefreshTokenGrantTypeInterface $refreshTokenGrantType = null,
+        ?GrantTypeInterface $grantType = null,
+        ?RefreshTokenGrantTypeInterface $refreshTokenGrantType = null,
         array $options = []
     ) {
         parent::__construct($client, $grantType, $refreshTokenGrantType);
