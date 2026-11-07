@@ -1,16 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Sainsburys\Guzzle\Oauth2\GrantType;
 
 interface RefreshTokenGrantTypeInterface extends GrantTypeInterface
 {
-    /**
-     * @param string $refreshToken
-     */
-    public function setRefreshToken($refreshToken);
+    public function setRefreshToken(string $refreshToken): void;
 
-    /**
-     * @return bool
-     */
-    public function hasRefreshToken();
+    public function hasRefreshToken(): bool;
 }

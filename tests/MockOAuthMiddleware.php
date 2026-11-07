@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Sainsburys\Guzzle\Oauth2\Tests;
 
 use Sainsburys\Guzzle\Oauth2\AccessToken;
@@ -14,17 +16,12 @@ use Psr\Http\Message\ResponseInterface;
 
 class MockOAuthMiddleware extends OAuthMiddleware
 {
-    const KEY_TOKEN_EXPIRED_ON_FAILURE_COUNT = 'tokenExpiredOnFailureCount';
+    public const string KEY_TOKEN_EXPIRED_ON_FAILURE_COUNT = 'tokenExpiredOnFailureCount';
 
-    /**
-     * @var array
-     */
-    protected $options;
+    /** @var array<string, mixed> */
+    protected array $options;
 
-    /**
-     * @var int
-     */
-    private $tokenExpiredOnFailureCount;
+    private int $tokenExpiredOnFailureCount;
 
     /**
      * Create a new Oauth2 subscriber.
@@ -49,7 +46,7 @@ class MockOAuthMiddleware extends OAuthMiddleware
     /**
      * @return \Closure
      */
-    public function modifyBeforeOnFailure()
+    public function modifyBeforeOnFailure(): \Closure
     {
         $calls = 0;
 
@@ -62,9 +59,9 @@ class MockOAuthMiddleware extends OAuthMiddleware
                         if (
                             isset($this->options[self::KEY_TOKEN_EXPIRED_ON_FAILURE_COUNT]) &&
                             isset($options['auth']) &&
-                            'oauth2' == $options['auth'] &&
+                            'oauth2' === $options['auth'] &&
                             $this->grantType instanceof GrantTypeInterface &&
-                            $this->grantType->getConfigByName(GrantTypeBase::CONFIG_TOKEN_URL) != $request->getUri()->getPath()
+                            $this->grantType->getConfigByName(GrantTypeBase::CONFIG_TOKEN_URL) !== $request->getUri()->getPath()
                         ) {
                             ++$this->tokenExpiredOnFailureCount;
                             if ($this->tokenExpiredOnFailureCount <= $this->options[self::KEY_TOKEN_EXPIRED_ON_FAILURE_COUNT]) {

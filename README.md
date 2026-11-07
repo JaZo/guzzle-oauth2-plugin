@@ -25,6 +25,19 @@ Version 1.x (on the `release/1.0` branch) is intended for Guzzle 3 [Unmaintained
         "sainsburys/guzzle-oauth2-plugin": "^1.0"
 ```
 
+## Upgrading from 3.x to 4.x
+
+- PHP 8.5+, `guzzlehttp/guzzle` ^7.10 and `firebase/php-jwt` ^7.0 are required.
+- All classes use `declare(strict_types=1)` and native parameter, return, property
+  and class constant types. Classes extending or implementing the plugin's classes and
+  interfaces (e.g. a custom grant type) need to add matching signatures, for example
+  `getToken(): AccessToken`, `getConfigByName(string $name): mixed`,
+  `setRefreshToken(string $refreshToken): void`, `getDefaults(): array`.
+- `OAuthMiddleware::setAccessToken()` and `setRefreshToken()` accept `AccessToken|string`
+  only; other values now raise a `TypeError` instead of an `InvalidArgumentException`.
+- A token endpoint response without an `access_token` raises an `UnexpectedValueException`;
+  an invalid JSON response raises a `JsonException`.
+
 ## Features
 
 - Acquires access tokens via one of the supported grant types (code, client credentials,

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Sainsburys\Guzzle\Oauth2\Tests\GrantType;
 
 use Sainsburys\Guzzle\Oauth2\GrantType\AuthorizationCode;
@@ -7,7 +9,7 @@ use Sainsburys\Guzzle\Oauth2\Tests\TestBase;
 
 class AuthorizationCodeTest extends TestBase
 {
-    public function testMissingParentConfigException()
+    public function testMissingParentConfigException(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The config is missing the following key: "client_id"');
@@ -15,7 +17,7 @@ class AuthorizationCodeTest extends TestBase
         new AuthorizationCode($this->createClient());
     }
 
-    public function testMissingConfigException()
+    public function testMissingConfigException(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The config is missing the following key: "code"');

@@ -1,6 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Sainsburys\Guzzle\Oauth2\GrantType;
+
+use Sainsburys\Guzzle\Oauth2\AccessToken;
 
 /**
  * Refresh token grant type.
@@ -9,41 +13,26 @@ namespace Sainsburys\Guzzle\Oauth2\GrantType;
  */
 class RefreshToken extends GrantTypeBase implements RefreshTokenGrantTypeInterface
 {
-    const CONFIG_REFRESH_TOKEN = 'refresh_token';
+    public const string CONFIG_REFRESH_TOKEN = 'refresh_token';
 
-    /**
-     * @var string
-     */
-    protected $grantType = 'refresh_token';
+    protected string $grantType = 'refresh_token';
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function getDefaults()
+    protected function getDefaults(): array
     {
         return parent::getDefaults() + [self::CONFIG_REFRESH_TOKEN => ''];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setRefreshToken($refreshToken)
+    public function setRefreshToken(string $refreshToken): void
     {
         $this->config[self::CONFIG_REFRESH_TOKEN] = $refreshToken;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function hasRefreshToken()
+    public function hasRefreshToken(): bool
     {
         return !empty($this->config[self::CONFIG_REFRESH_TOKEN]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getToken()
+    public function getToken(): AccessToken
     {
         if (!$this->hasRefreshToken()) {
             throw new \RuntimeException('Refresh token not available');

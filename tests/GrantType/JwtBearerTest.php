@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Sainsburys\Guzzle\Oauth2\Tests\GrantType;
 
 use Sainsburys\Guzzle\Oauth2\GrantType\JwtBearer;
@@ -8,7 +10,7 @@ use SplFileObject;
 
 class JwtBearerTest extends TestBase
 {
-    public function testMissingParentConfigException()
+    public function testMissingParentConfigException(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The config is missing the following key: "client_id"');
@@ -16,7 +18,7 @@ class JwtBearerTest extends TestBase
         new JwtBearer($this->createClient());
     }
 
-    public function testMissingConfigException()
+    public function testMissingConfigException(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The config is missing the following key: "private_key"');
@@ -26,7 +28,7 @@ class JwtBearerTest extends TestBase
         ]);
     }
 
-    public function testPrivateKeyNotSplFileObject()
+    public function testPrivateKeyNotSplFileObject(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('private_key needs to be instance of SplFileObject');
@@ -37,7 +39,7 @@ class JwtBearerTest extends TestBase
         ]);
     }
 
-    public function testValidRequestGetsToken()
+    public function testValidRequestGetsToken(): void
     {
         $grantType = new JwtBearer($this->createClient(), [
             'client_id' => 'testClient',

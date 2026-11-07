@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Sainsburys\Guzzle\Oauth2\GrantType;
 
 /**
@@ -9,5 +11,5 @@ namespace Sainsburys\Guzzle\Oauth2\GrantType;
  */
 class ClientCredentials extends GrantTypeBase
 {
-    protected $grantType = 'client_credentials';
+    protected string $grantType = 'client_credentials';
 }
