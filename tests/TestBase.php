@@ -6,7 +6,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\HandlerStack;
 
-abstract class TestBase extends \PHPUnit_Framework_TestCase
+abstract class TestBase extends \PHPUnit\Framework\TestCase
 {
     /** @var ClientInterface */
     protected $client;

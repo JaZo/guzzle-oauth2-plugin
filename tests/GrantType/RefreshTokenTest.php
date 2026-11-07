@@ -17,6 +17,16 @@ class RefreshTokenTest extends TestBase
         $grant->getToken();
     }
 
+    public function testGetConfigByNameWithNullReturnsNull()
+    {
+        $grant = new RefreshToken($this->createClient(), [
+            'client_id' => 'test',
+        ]);
+
+        $this->assertNull($grant->getConfigByName(null));
+        $this->assertSame('test', $grant->getConfigByName('client_id'));
+    }
+
     public function testMissingParentConfigException()
     {
         $this->expectException(\InvalidArgumentException::class);

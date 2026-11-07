@@ -4,7 +4,7 @@ namespace Sainsburys\Guzzle\Oauth2\Tests;
 
 use Sainsburys\Guzzle\Oauth2\AccessToken;
 
-class AccessTokenTest extends \PHPUnit_Framework_TestCase
+class AccessTokenTest extends \PHPUnit\Framework\TestCase
 {
     public function testAccessTokenGetters()
     {
@@ -33,5 +33,12 @@ class AccessTokenTest extends \PHPUnit_Framework_TestCase
 
         $token = new AccessToken('testToken', 'bearer', ['expires' => time() + 500]);
         $this->assertFalse($token->isExpired());
+    }
+
+    public function testAccessTokenAcceptsNonIntegerExpiresIn()
+    {
+        $token = new AccessToken('testToken', 'bearer', ['expires_in' => '3600.5']);
+        $this->assertFalse($token->isExpired());
+        $this->assertGreaterThan(time() + 3500, $token->getExpires()->getTimestamp());
     }
 }

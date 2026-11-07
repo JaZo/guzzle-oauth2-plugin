@@ -36,7 +36,7 @@ class AccessToken
             $this->expires->setTimestamp($data['expires']);
         } elseif (isset($data['expires_in'])) {
             $this->expires = new \DateTime();
-            $this->expires->add(new \DateInterval(sprintf('PT%sS', $data['expires_in'])));
+            $this->expires->add(new \DateInterval(sprintf('PT%dS', (int) $data['expires_in'])));
         }
         if (isset($data['refresh_token'])) {
             $this->refreshToken = new self($data['refresh_token'], 'refresh_token');

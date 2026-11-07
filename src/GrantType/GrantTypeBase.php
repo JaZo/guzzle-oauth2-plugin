@@ -101,7 +101,7 @@ abstract class GrantTypeBase implements GrantTypeInterface
      */
     public function getConfigByName($name)
     {
-        if (array_key_exists($name, $this->config)) {
+        if ($name !== null && array_key_exists($name, $this->config)) {
             return $this->config[$name];
         }
 
