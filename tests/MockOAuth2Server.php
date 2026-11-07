@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Sainsburys\Guzzle\Oauth2\Tests;
 
 
@@ -10,19 +12,17 @@ use Psr\Http\Message\RequestInterface;
 
 class MockOAuth2Server
 {
-    const KEY_TOKEN_EXPIRES_IN = 'tokenExpiresIn';
-    const KEY_TOKEN_PATH = 'tokenPath';
-    const KEY_TOKEN_INVALID_COUNT = 'tokenInvalidCount';
-    const KEY_EXPECTED_QUERY_COUNT = 'expectedQueryCount';
+    public const string KEY_TOKEN_EXPIRES_IN = 'tokenExpiresIn';
+    public const string KEY_TOKEN_PATH = 'tokenPath';
+    public const string KEY_TOKEN_INVALID_COUNT = 'tokenInvalidCount';
+    public const string KEY_EXPECTED_QUERY_COUNT = 'expectedQueryCount';
 
-    /** @var array */
-    protected $options;
+    /** @var array<string, mixed> */
+    protected array $options;
 
-    /** @var HandlerStack */
-    private $handlerStack;
+    private HandlerStack $handlerStack;
 
-    /** @var int */
-    private $tokenInvalidCount = 0;
+    private int $tokenInvalidCount = 0;
 
     /**
      * @param array $options
@@ -55,7 +55,7 @@ class MockOAuth2Server
     /**
      * @return HandlerStack
      */
-    public function getHandlerStack()
+    public function getHandlerStack(): HandlerStack
     {
         return $this->handlerStack;
     }
@@ -68,11 +68,11 @@ class MockOAuth2Server
      *
      * @return Response
      */
-    protected function getResult(RequestInterface $request, array $options)
+    protected function getResult(RequestInterface $request, array $options): Response
     {
         if ($request->getUri()->getPath() === $this->options[self::KEY_TOKEN_PATH]) {
             return $this->oauth2Token($request, $options);
-        } elseif (strpos($request->getUri()->getPath(), '/api/') !== false) {
+        } elseif (str_contains($request->getUri()->getPath(), '/api/')) {
             return $this->mockApiCall($request);
         }
 
@@ -87,7 +87,7 @@ class MockOAuth2Server
      *
      * @return Response
      */
-    protected function oauth2Token(RequestInterface $request, array $options)
+    protected function oauth2Token(RequestInterface $request, array $options): Response
     {
         $body = $request->getBody()->__toString();
         $requestBody = [];
@@ -113,7 +113,7 @@ class MockOAuth2Server
     /**
      * @return Response
      */
-    protected function validTokenResponse()
+    protected function validTokenResponse(): Response
     {
         $token = [
             'access_token' => 'token',
@@ -137,9 +137,9 @@ class MockOAuth2Server
      *
      * @return Response
      */
-    protected function grantTypePassword(array $requestBody)
+    protected function grantTypePassword(array $requestBody): Response
     {
-        if ($requestBody['username'] != 'validUsername' || $requestBody['password'] != 'validPassword') {
+        if (($requestBody['username'] ?? null) !== 'validUsername' || ($requestBody['password'] ?? null) !== 'validPassword') {
             // @todo correct response headers
             return new Response(401);
         }
@@ -154,7 +154,7 @@ class MockOAuth2Server
      *
      * @return Response
      */
-    protected function grantTypeClientCredentials(array $options)
+    protected function grantTypeClientCredentials(array $options): Response
     {
         if (!isset($options['auth']) || !isset($options['auth'][1]) || $options['auth'][1] != 'testSecret') {
             // @todo correct response headers
@@ -169,7 +169,7 @@ class MockOAuth2Server
      *
      * @return Response
      */
-    protected function grantTypeRefreshToken(array $requestBody)
+    protected function grantTypeRefreshToken(array $requestBody): Response
     {
         if ($requestBody['refresh_token'] == 'refreshTokenInvalid') {
             return new Response(401);
@@ -183,7 +183,7 @@ class MockOAuth2Server
      *
      * @return Response
      */
-    protected function grantTypeJwtBearer(array $requestBody)
+    protected function grantTypeJwtBearer(array $requestBody): Response
     {
         if (!array_key_exists('assertion', $requestBody)) {
             return new Response(401);
@@ -197,7 +197,7 @@ class MockOAuth2Server
      *
      * @return Response
      */
-    protected function mockApiCall(RequestInterface $request)
+    protected function mockApiCall(RequestInterface $request): Response
     {
         if (
             empty($request->getHeader('Authorization')) ||

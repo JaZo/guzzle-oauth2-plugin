@@ -1,50 +1,49 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Sainsburys\Guzzle\Oauth2\GrantType;
 
 use Sainsburys\Guzzle\Oauth2\AccessToken;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\RequestOptions;
 use InvalidArgumentException;
+use UnexpectedValueException;
 
 abstract class GrantTypeBase implements GrantTypeInterface
 {
-    const CONFIG_TOKEN_URL = 'token_url';
-    const CONFIG_CLIENT_ID = 'client_id';
-    const CONFIG_CLIENT_SECRET = 'client_secret';
-    const CONFIG_AUTH_LOCATION = 'auth_location';
-    const CONFIG_RESOURCE = 'resource';
+    public const string CONFIG_TOKEN_URL = 'token_url';
+    public const string CONFIG_CLIENT_ID = 'client_id';
+    public const string CONFIG_CLIENT_SECRET = 'client_secret';
+    public const string CONFIG_AUTH_LOCATION = 'auth_location';
+    public const string CONFIG_RESOURCE = 'resource';
 
-    const GRANT_TYPE = 'grant_type';
+    public const string GRANT_TYPE = 'grant_type';
 
-    const MISSING_ARGUMENT = 'The config is missing the following key: "%s"';
+    public const string MISSING_ARGUMENT = 'The config is missing the following key: "%s"';
 
     /**
-     * @var ClientInterface The token endpoint client
+     * The token endpoint client.
      */
-    protected $client;
+    protected ClientInterface $client;
 
     /**
-     * @var array Configuration settings
+     * @var array<string, mixed> Configuration settings
      */
-    protected $config;
+    protected array $config;
+
+    protected string $grantType = '';
 
     /**
-     * @var string
-     */
-    protected $grantType = '';
-
-    /**
-     * @param ClientInterface $client
-     * @param array           $config
+     * @param array<string, mixed> $config
      */
     public function __construct(ClientInterface $client, array $config = [])
     {
         $this->client = $client;
         $this->config = array_merge($this->getDefaults(), $config);
 
-        foreach ($this->getRequired() as $key => $requiredAttribute) {
-            if (!isset($this->config[$key]) || empty($this->config[$key])) {
+        foreach (array_keys($this->getRequired()) as $key) {
+            if (empty($this->config[$key])) {
                 throw new InvalidArgumentException(sprintf(self::MISSING_ARGUMENT, $key));
             }
         }
@@ -53,9 +52,9 @@ abstract class GrantTypeBase implements GrantTypeInterface
     /**
      * Get default configuration items.
      *
-     * @return array
+     * @return array<string, mixed>
      */
-    protected function getDefaults()
+    protected function getDefaults(): array
     {
         return [
             'scope' => '',
@@ -67,9 +66,9 @@ abstract class GrantTypeBase implements GrantTypeInterface
     /**
      * Get required configuration items.
      *
-     * @return string[]
+     * @return array<string, mixed>
      */
-    protected function getRequired()
+    protected function getRequired(): array
     {
         return [
             self::CONFIG_CLIENT_ID => '',
@@ -79,39 +78,27 @@ abstract class GrantTypeBase implements GrantTypeInterface
     /**
      * Get additional options, if any.
      *
-     * @return array|null
+     * @return array<string, mixed>|null
      */
-    protected function getAdditionalOptions()
+    protected function getAdditionalOptions(): ?array
     {
         return null;
     }
 
     /**
-     * @return array
+     * @return array<string, mixed>
      */
-    public function getConfig()
+    public function getConfig(): array
     {
         return $this->config;
     }
 
-    /**
-     * @param string $name
-     *
-     * @return mixed|null
-     */
-    public function getConfigByName($name)
+    public function getConfigByName(string $name): mixed
     {
-        if (array_key_exists($name, $this->config)) {
-            return $this->config[$name];
-        }
-
-        return null;
+        return $this->config[$name] ?? null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getToken()
+    public function getToken(): AccessToken
     {
         $body = $this->config;
         $body[self::GRANT_TYPE] = $this->grantType;
@@ -122,7 +109,7 @@ abstract class GrantTypeBase implements GrantTypeInterface
         if ($this->config[self::CONFIG_AUTH_LOCATION] !== RequestOptions::BODY) {
             $requestOptions[RequestOptions::AUTH] = [
                 $this->config[self::CONFIG_CLIENT_ID],
-                isset($this->config[self::CONFIG_CLIENT_SECRET]) ? $this->config[self::CONFIG_CLIENT_SECRET] : '',
+                $this->config[self::CONFIG_CLIENT_SECRET] ?? '',
             ];
             unset($body[self::CONFIG_CLIENT_ID], $body[self::CONFIG_CLIENT_SECRET]);
         }
@@ -133,9 +120,15 @@ abstract class GrantTypeBase implements GrantTypeInterface
             $requestOptions = array_merge_recursive($requestOptions, $additionalOptions);
         }
 
-        $response = $this->client->post($this->config[self::CONFIG_TOKEN_URL], $requestOptions);
-        $data = json_decode($response->getBody()->__toString(), true);
+        $response = $this->client->request('POST', $this->config[self::CONFIG_TOKEN_URL], $requestOptions);
+        $data = json_decode((string) $response->getBody(), true, 512, JSON_THROW_ON_ERROR);
 
-        return new AccessToken($data['access_token'], $data['token_type'], $data);
+        if (!is_array($data) || !isset($data['access_token']) || !is_string($data['access_token'])) {
+            throw new UnexpectedValueException('The token endpoint response does not contain an access token.');
+        }
+
+        $tokenType = $data['token_type'] ?? null;
+
+        return new AccessToken($data['access_token'], is_string($tokenType) ? $tokenType : null, $data);
     }
 }

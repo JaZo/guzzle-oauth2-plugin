@@ -1,18 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Sainsburys\Guzzle\Oauth2\Tests;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\HandlerStack;
 
-abstract class TestBase extends \PHPUnit_Framework_TestCase
+abstract class TestBase extends \PHPUnit\Framework\TestCase
 {
-    /** @var ClientInterface */
-    protected $client;
+    protected ?ClientInterface $client = null;
 
-    /** @var MockOAuth2Server */
-    protected $server;
+    protected ?MockOAuth2Server $server = null;
 
     /**
      * @param array $options
@@ -20,7 +20,7 @@ abstract class TestBase extends \PHPUnit_Framework_TestCase
      *
      * @return Client
      */
-    protected function createClient(array $options = [], array $serverOptions = [])
+    protected function createClient(array $options = [], array $serverOptions = []): Client
     {
         $this->server = new MockOAuth2Server($serverOptions);
         $this->client = new Client(
@@ -33,7 +33,7 @@ abstract class TestBase extends \PHPUnit_Framework_TestCase
     /**
      * @return ClientInterface|null
      */
-    protected function getClient()
+    protected function getClient(): ?ClientInterface
     {
         return $this->client;
     }
@@ -41,7 +41,7 @@ abstract class TestBase extends \PHPUnit_Framework_TestCase
     /**
      * @return HandlerStack|null
      */
-    protected function getHandlerStack()
+    protected function getHandlerStack(): ?HandlerStack
     {
         if ($this->server instanceof MockOAuth2Server) {
             return $this->server->getHandlerStack();

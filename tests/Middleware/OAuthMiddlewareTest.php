@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Sainsburys\Guzzle\Oauth2\Tests\Middleware;
 
 use Sainsburys\Guzzle\Oauth2\AccessToken;
@@ -14,7 +16,7 @@ use Psr\Http\Message\ResponseInterface;
 
 class OAuthMiddlewareTest extends TestBase
 {
-    public function testMiddlewareOnBeforeWhenAccessTokenNotSetYet()
+    public function testMiddlewareOnBeforeWhenAccessTokenNotSetYet(): void
     {
         $client = $this->createClient([
             RequestOptions::AUTH => 'oauth2',
@@ -38,7 +40,7 @@ class OAuthMiddlewareTest extends TestBase
         $this->assertEquals(200, $response->getStatusCode());
     }
 
-    public function testMiddlewareOnBeforeUsesRefreshToken()
+    public function testMiddlewareOnBeforeUsesRefreshToken(): void
     {
         $credentials = [
             'client_id' => 'test',
@@ -90,7 +92,7 @@ class OAuthMiddlewareTest extends TestBase
         $this->assertEquals('refreshToken', $newRefreshToken->getToken());
     }
 
-    public function testMiddlewareOnFailureUsesRefreshToken()
+    public function testMiddlewareOnFailureUsesRefreshToken(): void
     {
         $credentials = [
             'client_id' => 'test',
@@ -143,7 +145,7 @@ class OAuthMiddlewareTest extends TestBase
         $this->assertEquals('refreshToken', $newRefreshToken->getToken());
     }
 
-    public function testMiddlewareWithValidNotExpiredToken()
+    public function testMiddlewareWithValidNotExpiredToken(): void
     {
         $client = $this->createClient([
             RequestOptions::AUTH => 'oauth2',
@@ -171,7 +173,7 @@ class OAuthMiddlewareTest extends TestBase
         $this->assertEquals(200, $response->getStatusCode());
     }
 
-    public function testOnFailureWhichReachesLimit()
+    public function testOnFailureWhichReachesLimit(): void
     {
         $client = $this->createClient([
             RequestOptions::AUTH => 'oauth2',
@@ -198,7 +200,7 @@ class OAuthMiddlewareTest extends TestBase
         $this->assertEquals(401, $response->getStatusCode());
     }
 
-    public function testOnFailureWhichSuccessOnThirdTime()
+    public function testOnFailureWhichSuccessOnThirdTime(): void
     {
         $client = $this->createClient([
             RequestOptions::AUTH => 'oauth2',
@@ -224,17 +226,16 @@ class OAuthMiddlewareTest extends TestBase
         $this->assertEquals(200, $response->getStatusCode());
     }
 
-    public function testSettingManualAccessTokenWithInvalidValue()
+    public function testSettingManualAccessTokenWithInvalidValue(): void
     {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid access token');
+        $this->expectException(\TypeError::class);
 
         $client = $this->createClient([], []);
         $middleware = new OAuthMiddleware($client);
         $middleware->setAccessToken([]);
     }
 
-    public function testSettingManualRefreshTokenWhenNoAccessToken()
+    public function testSettingManualRefreshTokenWhenNoAccessToken(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Unable to update the refresh token. You have never set first the access token.');
@@ -244,7 +245,7 @@ class OAuthMiddlewareTest extends TestBase
         $middleware->setRefreshToken('refreshToken');
     }
 
-    public function testSettingManualRefreshTokenWithRefreshTokenGrantType()
+    public function testSettingManualRefreshTokenWithRefreshTokenGrantType(): void
     {
         $credentials = [
             'client_id' => 'test',
@@ -267,7 +268,7 @@ class OAuthMiddlewareTest extends TestBase
         $this->assertEquals('refreshToken', $refreshTokenGrantType->getConfigByName(RefreshToken::CONFIG_REFRESH_TOKEN));
     }
 
-    public function testSettingManualRefreshToken()
+    public function testSettingManualRefreshToken(): void
     {
         $client = $this->createClient([], []);
 

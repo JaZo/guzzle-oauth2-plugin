@@ -1,112 +1,87 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Sainsburys\Guzzle\Oauth2;
 
 use InvalidArgumentException;
 
 class AccessToken
 {
-    /** @var string */
-    protected $token;
+    protected string $token;
 
-    /** @var \DateTime|null */
-    protected $expires;
+    protected ?\DateTime $expires = null;
 
-    /** @var string */
-    protected $type;
+    protected ?string $type;
 
-    /** @var AccessToken|null */
-    protected $refreshToken;
+    protected ?AccessToken $refreshToken = null;
 
-    /** @var array */
-    protected $data;
+    /** @var array<string, mixed> */
+    protected array $data;
 
     /**
-     * @param string $token
-     * @param string $type  The token type (from OAuth2 key 'token_type').
-     * @param array  $data  Other token data.
+     * @param string               $token
+     * @param string|null          $type  The token type (from OAuth2 key 'token_type').
+     * @param array<string, mixed> $data  Other token data.
      */
-    public function __construct($token, $type, array $data = [])
+    public function __construct(string $token, ?string $type, array $data = [])
     {
         $this->token = $token;
         $this->type = $type;
         $this->data = $data;
         if (isset($data['expires'])) {
             $this->expires = new \DateTime();
-            $this->expires->setTimestamp($data['expires']);
+            $this->expires->setTimestamp((int) $data['expires']);
         } elseif (isset($data['expires_in'])) {
             $this->expires = new \DateTime();
-            $this->expires->add(new \DateInterval(sprintf('PT%sS', $data['expires_in'])));
+            $this->expires->add(new \DateInterval(sprintf('PT%dS', (int) $data['expires_in'])));
         }
         if (isset($data['refresh_token'])) {
-            $this->refreshToken = new self($data['refresh_token'], 'refresh_token');
+            $this->refreshToken = new self((string) $data['refresh_token'], 'refresh_token');
         }
     }
 
-    /**
-     * @return bool
-     */
-    public function isExpired()
+    public function isExpired(): bool
     {
         return $this->expires !== null && $this->expires->getTimestamp() < time();
     }
 
-    /**
-     * @return \DateTime|null
-     */
-    public function getExpires()
+    public function getExpires(): ?\DateTime
     {
         return $this->expires;
     }
 
     /**
-     * @return array
+     * @return array<string, mixed>
      */
-    public function getData()
+    public function getData(): array
     {
         return $this->data;
     }
 
-    /**
-     * @return string
-     */
-    public function getScope()
+    public function getScope(): string
     {
-        return isset($this->data['scope']) ? $this->data['scope'] : '';
+        return (string) ($this->data['scope'] ?? '');
     }
 
-    /**
-     * @return string
-     */
-    public function getToken()
+    public function getToken(): string
     {
         return $this->token;
     }
 
-    /**
-     * @return AccessToken|null
-     */
-    public function getRefreshToken()
+    public function getRefreshToken(): ?AccessToken
     {
         return $this->refreshToken;
     }
 
-    /**
-     * @return string
-     */
-    public function getType()
+    public function getType(): ?string
     {
         return $this->type;
     }
 
-    /**
-     * @param AccessToken $refreshToken
-     *
-     * @return self
-     */
-    public function setRefreshToken(AccessToken $refreshToken)
+    public function setRefreshToken(AccessToken $refreshToken): static
     {
-        if ($refreshToken->getType() != 'refresh_token') {
+        if ($refreshToken->getType() !== 'refresh_token') {
             throw new InvalidArgumentException(sprintf('Expected AccessToken to be "refresh_token" type, got "%s"', $refreshToken->getType()));
         }
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Sainsburys\Guzzle\Oauth2\Tests\GrantType;
 
 use Sainsburys\Guzzle\Oauth2\GrantType\PasswordCredentials;
@@ -7,7 +9,7 @@ use Sainsburys\Guzzle\Oauth2\Tests\TestBase;
 
 class PasswordCredentialsTest extends TestBase
 {
-    public function testMissingParentConfigException()
+    public function testMissingParentConfigException(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The config is missing the following key: "client_id"');
@@ -15,7 +17,7 @@ class PasswordCredentialsTest extends TestBase
         new PasswordCredentials($this->createClient());
     }
 
-    public function testMissingUsernameConfigException()
+    public function testMissingUsernameConfigException(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The config is missing the following key: "username"');
@@ -25,7 +27,7 @@ class PasswordCredentialsTest extends TestBase
         ]);
     }
 
-    public function testMissingPasswordConfigException()
+    public function testMissingPasswordConfigException(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The config is missing the following key: "password"');
@@ -36,7 +38,7 @@ class PasswordCredentialsTest extends TestBase
         ]);
     }
 
-    public function testValidPasswordGetsToken()
+    public function testValidPasswordGetsToken(): void
     {
         $grantType = new PasswordCredentials($this->createClient(), [
             'client_id' => 'testClient',

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Sainsburys\Guzzle\Oauth2\GrantType;
 
 use Firebase\JWT\JWT;
@@ -16,13 +18,12 @@ use SplFileObject;
  */
 class JwtBearer extends GrantTypeBase
 {
-    const CONFIG_PRIVATE_KEY = 'private_key';
+    public const string CONFIG_PRIVATE_KEY = 'private_key';
 
-    protected $grantType = 'urn:ietf:params:oauth:grant-type:jwt-bearer';
+    protected string $grantType = 'urn:ietf:params:oauth:grant-type:jwt-bearer';
 
     /**
-     * @param ClientInterface $client
-     * @param array           $config
+     * @param array<string, mixed> $config
      */
     public function __construct(ClientInterface $client, array $config = [])
     {
@@ -33,18 +34,12 @@ class JwtBearer extends GrantTypeBase
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function getRequired()
+    protected function getRequired(): array
     {
         return array_merge(parent::getRequired(), [self::CONFIG_PRIVATE_KEY => null]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function getAdditionalOptions()
+    protected function getAdditionalOptions(): array
     {
         return [
             RequestOptions::FORM_PARAMS => [
@@ -55,16 +50,14 @@ class JwtBearer extends GrantTypeBase
 
     /**
      * Compute JWT, signing with provided private key.
-     *
-     * @return string
      */
-    protected function computeJwt()
+    protected function computeJwt(): string
     {
         $baseUri = $this->client->getConfig('base_uri');
 
         $payload = [
             'iss' => $this->config[self::CONFIG_CLIENT_ID],
-            'aud' => sprintf('%s/%s', rtrim(($baseUri instanceof UriInterface ? $baseUri->__toString() : ''), '/'), ltrim($this->config[self::CONFIG_TOKEN_URL], '/')),
+            'aud' => sprintf('%s/%s', rtrim(($baseUri instanceof UriInterface ? (string) $baseUri : ''), '/'), ltrim((string) $this->config[self::CONFIG_TOKEN_URL], '/')),
             'exp' => time() + 60 * 60,
             'iat' => time(),
         ];
@@ -74,12 +67,8 @@ class JwtBearer extends GrantTypeBase
 
     /**
      * Read private key.
-     *
-     * @param SplFileObject $privateKey
-     *
-     * @return string
      */
-    protected function readPrivateKey(SplFileObject $privateKey)
+    protected function readPrivateKey(SplFileObject $privateKey): string
     {
         $key = '';
         while (!$privateKey->eof()) {

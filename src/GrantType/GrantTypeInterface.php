@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Sainsburys\Guzzle\Oauth2\GrantType;
 
 use Sainsburys\Guzzle\Oauth2\AccessToken;
@@ -8,20 +10,13 @@ interface GrantTypeInterface
 {
     /**
      * Get the token data returned by the OAuth2 server.
-     *
-     * @return AccessToken
      */
-    public function getToken();
+    public function getToken(): AccessToken;
+
+    public function getConfigByName(string $name): mixed;
 
     /**
-     * @param string $name
-     *
-     * @return mixed|null
+     * @return array<string, mixed>
      */
-    public function getConfigByName($name);
-
-    /**
-     * @return array
-     */
-    public function getConfig();
+    public function getConfig(): array;
 }
